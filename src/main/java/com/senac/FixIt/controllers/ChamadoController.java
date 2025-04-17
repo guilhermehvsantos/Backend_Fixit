@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/chamados")
-@CrossOrigin(origins = "*") // permite requisições de qualquer origem
 public class ChamadoController {
 
     @Autowired

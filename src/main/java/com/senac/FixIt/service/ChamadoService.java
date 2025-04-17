@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ChamadoService {
@@ -62,28 +63,22 @@ public class ChamadoService {
         return false;
     }
 
-    // 🔍 Filtros combinados (status, prioridade, departamento, texto de busca)
-    public List<Chamado> filtrarChamados(String status, String prioridade, String departamento, String textoBusca) {
-        // Filtro por texto de busca
-        if (textoBusca != null && !textoBusca.isEmpty()) {
-            return chamadoRepository.findByTituloContainingIgnoreCaseOrDescricaoContainingIgnoreCase(textoBusca,
-                    textoBusca);
-        }
-
-        // Filtros combinados simples
-        return chamadoRepository.filtrarChamados(
-                status != null && !status.isEmpty() ? status : null,
-                prioridade != null && !prioridade.isEmpty() ? prioridade : null,
-                departamento != null && !departamento.isEmpty() ? departamento : null);
-    }
-
     public List<Chamado> searchChamados(String query) {
-        // TODO Auto-generated method stub
+        
         throw new UnsupportedOperationException("Unimplemented method 'searchChamados'");
     }
 
     public List<Chamado> filterChamados(String status, String prioridade, String departamento) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filterChamados'");
+        List<Chamado> todosChamados = chamadoRepository.findAll();
+    
+        return todosChamados.stream()
+                .filter(c -> status == null || c.getStatus().name().equalsIgnoreCase(status))
+                .filter(c -> prioridade == null || c.getPrioridade().name().equalsIgnoreCase(prioridade))
+                .filter(c -> departamento == null || 
+                    (c.getUsuario() != null && c.getUsuario().getDepartment() != null &&
+                     c.getUsuario().getDepartment().equalsIgnoreCase(departamento)))
+                .collect(Collectors.toList());
     }
+    
+
 }

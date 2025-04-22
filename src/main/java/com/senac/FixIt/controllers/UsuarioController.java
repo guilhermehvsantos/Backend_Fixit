@@ -12,6 +12,9 @@ import com.senac.FixIt.models.Usuario;
 import com.senac.FixIt.service.UsuarioService;
 import com.senac.FixIt.dto.LoginDTO;
 import com.senac.FixIt.dto.UsuarioResponseDTO;
+import com.senac.FixIt.dto.UsuarioUpdateDTO;
+import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/usuarios")
@@ -50,10 +53,9 @@ public class UsuarioController {
 
     // Endpoint para atualizar um usuário
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> updateUsuario(@PathVariable int id, @Valid @RequestBody Usuario usuarioDetails) {
-        return usuarioService.updateUsuario(id, usuarioDetails)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Usuario> updateUsuario(@PathVariable int id, @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
+        Optional<Usuario> updated = usuarioService.updateUsuario(id, usuarioUpdateDTO);
+        return updated.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     // Endpoint para deletar um usuário

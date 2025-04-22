@@ -25,6 +25,9 @@ public class Chamado {
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
+    @Column(name = "codigo", unique = true)
+    private String codigo;
+
     @NotBlank
     @Size(min = 3, max = 100)
     @Column(name = "titulo", nullable = false, length = 100)
@@ -45,6 +48,9 @@ public class Chamado {
 
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao = LocalDateTime.now();
+    
+    @Column(name = "data_atualizacao")
+    private LocalDateTime dataAtualizacao;
 
     @Column(name = "data_fechamento")
     private LocalDateTime dataFechamento;
@@ -57,7 +63,7 @@ public class Chamado {
     @JoinColumn(name = "tecnico_id")
     private Usuario tecnico; // técnico atribuído (pode ser null inicialmente)
 
-    @OneToMany(mappedBy = "chamado", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chamado", cascade = CascadeType.ALL)
     private List<Comentario> comentarios = new ArrayList<>();
 
 }

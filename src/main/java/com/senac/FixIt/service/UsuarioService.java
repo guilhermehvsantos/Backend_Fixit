@@ -10,6 +10,7 @@ import com.senac.FixIt.models.Usuario;
 import com.senac.FixIt.repository.UsuarioRepository;
 import com.senac.FixIt.dto.LoginDTO;
 import com.senac.FixIt.dto.UsuarioResponseDTO;
+import com.senac.FixIt.dto.UsuarioUpdateDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -89,36 +90,47 @@ public class UsuarioService {
         );
     }
     
-    // Método para atualizar um usuário
-    public Optional<Usuario> updateUsuario(int id, Usuario usuarioDetails) {
-        Optional<Usuario> existingUsuario = usuarioRepository.findById(id);
+public Optional<Usuario> updateUsuario(int id, UsuarioUpdateDTO usuarioDetails) {
+    Optional<Usuario> existingUsuario = usuarioRepository.findById(id);
 
-        if (existingUsuario.isPresent()) {
-            Usuario usuario = existingUsuario.get();
+    if (existingUsuario.isPresent()) {
+        Usuario usuario = existingUsuario.get();
 
-            // Verifica se o novo email já existe em outro usuário
+        if (usuarioDetails.getName() != null && !usuarioDetails.getName().isBlank()) {
+            usuario.setName(usuarioDetails.getName());
+        }
+
+        if (usuarioDetails.getEmail() != null && !usuarioDetails.getEmail().isBlank()) {
             if (!usuario.getEmail().equals(usuarioDetails.getEmail()) &&
                 usuarioRepository.existsByEmail(usuarioDetails.getEmail())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já está em uso.");
             }
+            usuario.setEmail(usuarioDetails.getEmail());
+        }
 
-            // Verifica se o novo telefone já existe em outro usuário
+        if (usuarioDetails.getTelephone() != null && !usuarioDetails.getTelephone().isBlank()) {
             if (!usuario.getTelephone().equals(usuarioDetails.getTelephone()) &&
                 usuarioRepository.existsByTelephone(usuarioDetails.getTelephone())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Telefone já está em uso.");
             }
-
-            usuario.setName(usuarioDetails.getName());
-            usuario.setEmail(usuarioDetails.getEmail());
-            usuario.setPassword(usuarioDetails.getPassword());  // Corrigido: "setSenha" → "setPassword"
-            usuario.setDepartment(usuarioDetails.getDepartment());  // Corrigido: "setCargo" → "setDepartment"
             usuario.setTelephone(usuarioDetails.getTelephone());
-
-            return Optional.of(usuarioRepository.save(usuario));
         }
 
-        return Optional.empty();
+        if (usuarioDetails.getDepartment() != null && !usuarioDetails.getDepartment().isBlank()) {
+            usuario.setDepartment(usuarioDetails.getDepartment());
+        }
+
+        if (usuarioDetails.getPassword() != null && !usuarioDetails.getPassword().isBlank()) {
+            String senhaCriptografada = passwordEncoder.encode(usuarioDetails.getPassword());
+            usuario.setPassword(senhaCriptografada);
+        }
+
+        return Optional.of(usuarioRepository.save(usuario));
     }
+
+    return Optional.empty();
+}
+
 
     // Método para deletar um usuário
     public boolean deleteUsuario(int id) {

@@ -2,6 +2,8 @@ package com.senac.FixIt.service;
 
 import com.senac.FixIt.models.Chamado;
 import com.senac.FixIt.repository.ChamadoRepository;
+import java.time.format.DateTimeFormatter;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,9 +28,19 @@ public class ChamadoService {
         return chamadoRepository.findById(id);
     }
 
-    // 📌 Criar novo chamado
     public Chamado createChamado(Chamado chamado) {
-        return chamadoRepository.save(chamado);
+
+
+        Chamado salvo = chamadoRepository.save(chamado);
+
+        String prioridadeInicial = salvo.getPrioridade().name().substring(0, 1);
+        String dataInvertida = salvo.getDataCriacao().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+        String id = String.valueOf(salvo.getId());
+
+        String codigo = String.format("%s-%s-%s", prioridadeInicial,  dataInvertida, id);
+        salvo.setCodigo(codigo);
+
+        return chamadoRepository.save(salvo);
     }
 
     // 🛠️ Atualizar chamado existente
@@ -38,12 +50,9 @@ public class ChamadoService {
         if (optionalChamado.isPresent()) {
             Chamado chamado = optionalChamado.get();
 
-            chamado.setTitulo(chamadoDetails.getTitulo());
-            chamado.setDescricao(chamadoDetails.getDescricao());
+
             chamado.setStatus(chamadoDetails.getStatus());
-            chamado.setDataCriacao(chamadoDetails.getDataCriacao());
-            chamado.setPrioridade(chamadoDetails.getPrioridade());
-            chamado.setUsuario(chamadoDetails.getUsuario());
+            chamado.setComentarios(chamadoDetails.getComentarios());
             chamado.setTecnico(chamadoDetails.getTecnico());
             chamado.setDataFechamento(chamadoDetails.getDataFechamento());
 
